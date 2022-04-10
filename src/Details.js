@@ -1,14 +1,19 @@
 import { Component } from "react";
 import { withRouter } from "react-router-dom";
+import Carousal from "./Carousal";
+import ErrorBoundary from "./ErrorBoundary";
+import ThemeContext from "./ThemeContexts";
+import Modal from "./Model";
 
 class Details extends Component {
-  constructor(props) {
-    super(props);
+  state = { loading: true, showModal: false };
+  // constructor(props) {
+  //   super(props);
 
-    this.state = {
-      loading: true,
-    };
-  }
+  //   this.state = {
+  //     loading: true,
+  //   };
+  // }
 
   async componentDidMount() {
     const res = await fetch(
@@ -34,20 +39,64 @@ class Details extends Component {
     );
   }
 
+  toggleModal = () => {
+    this.setState({
+      showModal: !this.state.showModal,
+    });
+  };
+
+  adopt = () => (window.location = "http://bit.ly/pet-adopt");
+
   render() {
     console.log(this.state);
-    const { animal, breed, city, state, description, name } = this.state;
+
+    if (this.state.loading) {
+      return <h2>loading....</h2>;
+    }
+
+    const { animal, breed, city, state, description, name, images } =
+      this.state;
+
     return (
       <div className="details">
+        <Carousal images={images} />
         <div>
           <h1>{name}</h1>
           <h2>{`${animal} - ${breed} - ${city} - ${state}`}</h2>
-          <button> Adopt {name} </button>
+          <ThemeContext.Consumer>
+            {([theme]) => (
+              <button
+                onClick={this.toggleModal}
+                style={{ backgroundColor: theme }}
+              >
+                {" "}
+                Adopt {name}{" "}
+              </button>
+            )}
+          </ThemeContext.Consumer>
           <p>{description}</p>
+          {this.state.showModal ? (
+            <Modal>
+              <div>
+                <h1>would you like to adopt {name} ? </h1>
+                <div className="buttons">
+                  <button onClick={this.adopt}>Yes</button>
+                  <button onClick={this.toggleModal}>No, I'm a monster</button>
+                </div>
+              </div>
+            </Modal>
+          ) : null}
         </div>
       </div>
     );
   }
 }
 
-export default withRouter(Details);
+const DetailsWithRouter = withRouter(Details);
+export default function DetailsWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <DetailsWithRouter />
+    </ErrorBoundary>
+  );
+}
