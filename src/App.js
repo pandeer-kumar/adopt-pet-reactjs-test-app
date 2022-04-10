@@ -1,6 +1,7 @@
 import ReactDOM from "react-dom";
 import SearchParams from "./SearchParams";
 import Details from "./Details";
+import { StrictMode } from "react";
 
 // const App = () => {
 //   return React.createElement("div", { id: "my-brand" }, [
@@ -32,4 +33,9 @@ const App = () => {
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("root"));
+ReactDOM.render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+  document.getElementById("root")
+);
